@@ -96,16 +96,16 @@ class MifengSpider(scrapy.Spider):
         for i in range(0, len(list)):
             prices.append(float(list[i].split(",")[1]))
         
-        prices_max = round(max(prices), 2)
-        prices_min = round(min(prices), 2)
+        prices_max = round(max(prices), 3)
+        prices_min = round(min(prices), 3)
         prices_add = round((prices[-1] - prices[0]) * 100 / prices[0] , 2)
         if flag == 1:
-            key_value['day_max'] = str(prices_max)
-            key_value['day_min'] = str(prices_min)
+            key_value['day_max'] = '$'+str(prices_max)
+            key_value['day_min'] = '$'+str(prices_min)
             key_value['day_add'] = str(prices_add)+"%"
         elif flag == 7:
-            key_value['week_max'] = str(prices_max)
-            key_value['week_min'] = str(prices_min)
+            key_value['week_max'] = '$'+str(prices_max)
+            key_value['week_min'] = '$'+str(prices_min)
             key_value['week_add'] = str(prices_add)+"%"
         else:
             key_value['now_year'] = str(prices_add)+"%"

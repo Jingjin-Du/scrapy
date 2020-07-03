@@ -9,15 +9,23 @@ import sys
 def timer(n):
     for i in range(0, n):
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print("爬取一次")
-        os.system("scrapy crawl mifeng")
-        #os.system("scrapy crawl dmoz")
-        time.sleep(5)
+        print("爬🥧")
+        file = ""
+        mifengcha = 0
+        if mifengcha is True :
+            os.system("scrapy crawl mifeng")
+            file = 'data.out'
+        else:
+            os.system("scrapy crawl dmoz")
+            file = 'feixiaohao.out'
 
-        with open('data.out', 'r') as f:
+        with open(file, 'r') as f:
             out = f.read().split(' ')
             for it in out:
                 print(it)
+        
+        print("停🛑")
+        #time.sleep(5)
 
 
 # 时间
