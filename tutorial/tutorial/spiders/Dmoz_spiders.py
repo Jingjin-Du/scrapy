@@ -24,6 +24,7 @@ urls = {
         "非小号okb" : "https://www.feixiaohao.com/currencies/okb/",
         "非小号杂乱数据" : "https://dncapi.bqiapp.com/api/coin/coinchange?code=okb&webp=1",
         "非小号一周内价格" : "https://dncapi.bqiapp.com/api/coin/web-charts?code=okb&type=w&webp=1",
+        "非小号一天内价格" : "https://dncapi.bqiapp.com/api/coin/web-charts?code=okb&type=d&webp=1",
         "非小号手机端" : "https://m.feixiaohao.com/currencies/okb/",
         "aicoin" : "https://www.aicoin.cn/currencies/okb.html",
         }
@@ -34,6 +35,7 @@ class DmozSpider(scrapy.Spider):
     start_urls = [
         urls["非小号杂乱数据"],
         urls["非小号一周内价格"],
+        urls["非小号一天内价格"],
         urls["非小号手机端"],
         urls["aicoin"]
     ]
@@ -67,6 +69,8 @@ class DmozSpider(scrapy.Spider):
             self.feixiaohao_m(response)
         if response.url == urls["非小号一周内价格"]:
             self.feixiaohao_week_data(response)
+        if response.url == urls["非小号一天内价格"]:
+            self.feixiaohao_day_data(response)
         
         print(key_value)
         self.construct()
@@ -98,19 +102,26 @@ class DmozSpider(scrapy.Spider):
         price = []
         for it in data:
             price.append(float(it.split(",")[1]))
-        price_day = []
         price_week = []
         for i in range(0, len(price)):
-            j = len(price) - i - 1
-            price_week.append(price[j])
-            if j < 144:
-                price_day.append(price[j])
-        key_value['day_max'] = '$' + str(round(max(price_day), 3))
-        key_value['day_min'] = '$' + str(round(min(price_day), 3))
+            price_week.append(price[i])
         key_value['week_max'] = '$' + str(round(max(price_week), 3))
         key_value['week_min'] = '$' + str(round(min(price_week), 3))
 
-
+    #24H最大最小
+    def feixiaohao_day_data(self, response):
+        data = str(response.body, encoding = "utf8")
+        data = json.loads(data)['value']
+        print(type(data))
+        data = data[1:-1].split("],[")
+        price = []
+        for it in data:
+            price.append(float(it.split(",")[1]))
+        price_day = []
+        for i in range(0, len(price)):
+            price_day.append(price[i])
+        key_value['day_max'] = '$' + str(round(max(price_day), 3))
+        key_value['day_min'] = '$' + str(round(min(price_day), 3))
 
     #现价，排名，换手率，24H交易量 交易额
     def feixiaohao_m(self, response):

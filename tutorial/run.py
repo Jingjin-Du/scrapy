@@ -11,7 +11,7 @@ def timer(n):
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print("爬🥧")
         file = ""
-        mifengcha = 0
+        mifengcha = 1
         if mifengcha is True :
             os.system("scrapy crawl mifeng")
             file = 'data.out'
