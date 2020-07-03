@@ -105,16 +105,17 @@ class DmozSpider(scrapy.Spider):
             price_week.append(price[j])
             if j < 144:
                 price_day.append(price[j])
-        key_value['day_max'] = str(round(max(price_day), 3))
-        key_value['day_min'] = str(round(min(price_day), 3))
-        key_value['week_max'] = str(round(max(price_week), 3))
-        key_value['week_min'] = str(round(min(price_week), 3))
+        key_value['day_max'] = '$' + str(round(max(price_day), 3))
+        key_value['day_min'] = '$' + str(round(min(price_day), 3))
+        key_value['week_max'] = '$' + str(round(max(price_week), 3))
+        key_value['week_min'] = '$' + str(round(min(price_week), 3))
 
 
 
     #现价，排名，换手率，24H交易量 交易额
     def feixiaohao_m(self, response):
         price = response.css('div.sub_price')[0].css('span::text').extract()[1]
+        price = round(float(price), 2)
         key_value['price'] = '$' + str(price)
         rank = response.css('h1.coin_name').css('div')[-1].css('span::text').extract()[0]
         key_value['rank'] = rank[3:]
