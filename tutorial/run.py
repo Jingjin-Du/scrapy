@@ -21,8 +21,15 @@ def timer(n):
 
         with open(file, 'r') as f:
             out = f.read().split(' ')
-            for it in out:
-                print(it)
+            if len(out) == 0:
+                print("爬取出错，数据为空")
+            else:
+                for it in out:
+                    print(it)
+                
+        clear = ""
+        with open(file, 'w') as f:
+            f.write(clear)
         
         print("停🛑")
         #time.sleep(5)
