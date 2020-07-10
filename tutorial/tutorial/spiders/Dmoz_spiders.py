@@ -77,12 +77,10 @@ class DmozSpider(scrapy.Spider):
         
     #净流入
     def aicoin(self, response):
-        day_action = float(response.css('span.deg_down').css('span::text').extract()[0].replace(',',''))
-        day_action = self.usd_cny(day_action, 3) + "万"
-        if day_action[0] == '-':
-            key_value['day_in'] = day_action[0] + '$' + day_action[1 : ]
-        else :
-            key_value['day_in'] = '+$' + day_action
+        action = response.css('span.deg_up').css('span::text').extract()
+        day_action = float(action[1].replace(',',''))
+        day_action = self.usd_cny(day_action, 3)
+        key_value['day_in'] = action[0] + '$' + day_action + action[2]
 
     #24H涨幅，一周涨幅，今年来
     def feixiaohao_data(self, response):
@@ -179,7 +177,7 @@ class DmozSpider(scrapy.Spider):
         for key, value in key_name.items():
             col = key + ":" + key_value[value]
             output += col+"  "
-        with open('feixiaohao.out', 'w') as f:
+        with open('data.out', 'w') as f:
             f.write(output)
         
 

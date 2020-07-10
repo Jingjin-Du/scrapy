@@ -10,14 +10,12 @@ def timer(n):
     for i in range(0, n):
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print("爬🥧")
-        file = ""
-        mifengcha = 1
+        file = 'data.out'
+        mifengcha = 0
         if mifengcha is True :
             os.system("scrapy crawl mifeng")
-            file = 'data.out'
         else:
             os.system("scrapy crawl dmoz")
-            file = 'feixiaohao.out'
 
         with open(file, 'r') as f:
             out = f.read().split(' ')
