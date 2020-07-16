@@ -3,9 +3,9 @@ import re
 import json
 import urllib.request
 
-key_name = {'现价' : 'price', '目前市值排名': 'rank', '换手率' : 'hand', '24H最高' : 'day_max', '24H最低' : 'day_min', '7D最高' : 'week_max', '7D最低' : 'week_min', '24H涨幅' : 'day_add', '7D涨幅' : 'week_add', '今年来' : 'now_year', '24H交易量' : 'day_action_num', '24H交易额' : 'day_action', '24H净流入' : 'day_in'}
+key_name = {'现价' : 'price', '市值排名': 'rank', '换手率' : 'hand', '24H最高' : 'day_max', '24H最低' : 'day_min', '7D最高' : 'week_max', '7D最低' : 'week_min', '24H涨幅' : 'day_add', '7D涨幅' : 'week_add', '今年来涨幅' : 'now_year', '24H交易量' : 'day_action_num', '24H交易额' : 'day_action', '24H净流入' : 'day_in', '市场总值' : 'market'}
 
-key_value = {'price' : '', 'rank': '', 'hand' : '', 'day_max' : '', 'day_min' : '', 'week_max' : '', 'week_min' : '', 'day_add' : '', 'week_add' : '', 'now_year' : '', 'day_action_num' : '', 'day_action' : '', 'day_in' : ''}
+key_value = {'price' : '', 'rank': '', 'hand' : '', 'day_max' : '', 'day_min' : '', 'week_max' : '', 'week_min' : '', 'day_add' : '', 'week_add' : '', 'now_year' : '', 'day_action_num' : '', 'day_action' : '', 'day_in' : '', 'market' : ''}
 
 usdturl = "http://webforex.hermes.hexun.com/forex/quotelist?code=FOREXUSDCNY&column=Code,Price"
 req = urllib.request.Request(usdturl)
@@ -82,14 +82,20 @@ class DmozSpider(scrapy.Spider):
         day_action = self.usd_cny(day_action, 3)
         key_value['day_in'] = action[0] + '$' + day_action + action[2]
 
+    def flag(self, str):
+        if '-' in str or '+' in str:
+            return str + '%'
+        else:
+            return '+' + str + '%'
+
     #24H涨幅，一周涨幅，今年来
     def feixiaohao_data(self, response):
         data = str(response.body, encoding = "utf8")
         dic = json.loads(data)['data']
 
-        key_value['day_add'] = str(dic['change_day']) + '%'
-        key_value['week_add'] = str(dic['change_week']) + '%'
-        key_value['now_year'] = str(dic['change_thisyear']) + '%'
+        key_value['day_add'] = self.flag(str(dic['change_day']))
+        key_value['week_add'] = self.flag(str(dic['change_week']))
+        key_value['now_year'] = self.flag(str(dic['change_thisyear']))
 
     #24H最大最小  一周最大最小
     def feixiaohao_week_data(self, response):
@@ -121,7 +127,7 @@ class DmozSpider(scrapy.Spider):
         key_value['day_max'] = '$' + str(round(max(price_day), 3))
         key_value['day_min'] = '$' + str(round(min(price_day), 3))
 
-    #现价，排名，换手率，24H交易量 交易额
+    #现价，排名，换手率，24H交易量 交易额 市值
     def feixiaohao_m(self, response):
         price = response.css('div.sub_price')[0].css('span::text').extract()[1]
         price = round(float(price), 2)
@@ -133,6 +139,9 @@ class DmozSpider(scrapy.Spider):
 
         action = response.css('div.item')[3].css('span::text').extract()[2]
         key_value['day_action'] = '$' + self.usd_cny(action[:-1], 2) + action[-1]
+
+        market = response.css('div.sub_price')[1].css('span::text').extract()[2]
+        key_value['market'] = '$' + self.usd_cny(market[:-1], 2) + market[-1]
 
     
 
